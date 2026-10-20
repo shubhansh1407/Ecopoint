@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Ecopoint — Gamified Waste Segregation, Traceability and Circular Economy Platform. Track municipal waste custody, eliminate contamination, and earn verified community rewards.">
+  <meta name="theme-color" content="#66835B">
+  <title>Ecopoint — Gamified Waste Segregation & Traceability Platform</title>
+
+  <!-- Typography: Inter font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/css/theme.css">
+</head>
+<body>
+
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="logo-badge">
+          <!-- Recycling leaf logo SVG -->
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/>
+            <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1>Ecopoint</h1>
+          <p>Traceability Platform</p>
+        </div>
+      </div>
+
+      <nav class="nav-section" id="sidebar-nav">
+        <!-- Navigation dynamically rendered based on active role -->
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-profile-card">
+          <div class="avatar" id="user-avatar">U</div>
+          <div class="user-info">
+            <div class="user-name" id="user-full-name">Loading...</div>
+            <span class="user-role-badge" id="user-role-label">USER</span>
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="App.logout()" title="Logout" style="padding: 6px 8px;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="main-wrapper">
+      <!-- Topbar Header -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="menu-toggle-btn" onclick="document.getElementById('sidebar').classList.toggle('open')" aria-label="Toggle Navigation">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+          <div style="display: flex; align-items: baseline; gap: 10px;">
+            <span class="badge" style="background: var(--color-primary-light); color: var(--color-primary); font-size: 0.72rem;">College Demo Platform</span>
+            <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 500;">Simulated Traceability & Incentive System</span>
+          </div>
+        </div>
+
+        <div class="topbar-actions">
+          <!-- Role Switcher for instant evaluator demo -->
+          <div class="demo-switcher" title="Quick Role Switcher for demo & grading">
+            <button class="demo-btn" data-role="ROLE_USER" onclick="App.switchDemoAccount('user@ecopoint.com')">Citizen</button>
+            <button class="demo-btn" data-role="ROLE_COLLECTOR" onclick="App.switchDemoAccount('collector@ecopoint.com')">Collector</button>
+            <button class="demo-btn" data-role="ROLE_OPERATOR" onclick="App.switchDemoAccount('operator@ecopoint.com')">Facility</button>
+            <button class="demo-btn" data-role="ROLE_ADMIN" onclick="App.switchDemoAccount('admin@ecopoint.com')">Admin</button>
+          </div>
+
+          <!-- Points pill -->
+          <div class="badge" id="topbar-points-badge" style="background: var(--color-primary-light); color: var(--color-primary); font-size: 0.88rem; padding: 6px 14px;">
+            0 pts
+          </div>
+
+          <!-- Light/Dark theme toggle button -->
+          <button class="theme-toggle-btn" id="theme-btn" onclick="App.toggleTheme()" aria-label="Toggle theme">
+            <span id="theme-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            </span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Dynamic Content Page -->
+      <main class="content-area" id="main-content">
+        <!-- Rendered by app.js -->
+      </main>
+    </div>
+  </div>
+
+  <!-- Reusable Accessible Modal Dialog -->
+  <div class="modal-backdrop" id="app-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-window">
+      <div class="modal-header">
+        <h3 id="modal-title">Modal Title</h3>
+        <button class="modal-close-btn" onclick="App.closeModal()" aria-label="Close dialog">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body" id="modal-body">
+        <!-- Injected dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" aria-live="polite"></div>
+
+  <!-- Scripts -->
+  <script src="/js/api.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>
