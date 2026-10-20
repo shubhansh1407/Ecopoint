@@ -533,7 +533,7 @@ const App = {
       container.innerHTML = `
         <div style="margin-bottom: 24px;">
           <h2 style="font-size: 1.35rem; font-weight: 800;">Collector Dashboard — Pending Pickups</h2>
-          <p style="color: var(--text-secondary); font-size: 0.88rem;">Scan reusable bag QR code or verify bag code to confirm custody and transfer to facility.</p>
+          <p style="color: var(--text-secondary); font-size: 0.88rem;">Scan reusable bag code or verify bag code to confirm custody and transfer to facility.</p>
         </div>
 
         <div class="glass-card">
@@ -553,10 +553,10 @@ const App = {
                 <thead>
                   <tr>
                     <th>Deposit Code</th>
-                    <th>Bag Code (QR)</th>
+                    <th>Bag Identifier Code</th>
                     <th>Citizen</th>
                     <th>Category</th>
-                    <th>Est. Weight</th>
+                    <th>Estimated Weight</th>
                     <th>Registered At</th>
                     <th>Action</th>
                   </tr>
@@ -602,7 +602,7 @@ const App = {
       container.innerHTML = `
         <div style="margin-bottom: 24px;">
           <h2 style="font-size: 1.35rem; font-weight: 800;">Material Recovery Facility — Inbound Queue</h2>
-          <p style="color: var(--text-secondary); font-size: 0.88rem;">Weigh, grade contamination, record circular processing outcome, and approve EcoPoint credits.</p>
+          <p style="color: var(--text-secondary); font-size: 0.88rem;">Weigh, verify waste category, record circular processing outcome, and approve EcoPoint credits.</p>
         </div>
 
         <div class="glass-card">
@@ -1032,7 +1032,7 @@ const App = {
     const html = `
       <form id="deposit-form" onsubmit="App.handleDepositSubmit(event)">
         <div class="form-group">
-          <label class="form-label">Reusable Bag Code (QR Code)</label>
+          <label class="form-label">Reusable Bag Identifier Code</label>
           <input type="text" id="dep-bag-code" class="form-input" placeholder="e.g. BAG-1001" required value="BAG-1001">
           <small style="color: var(--text-muted); font-size: 0.75rem; display: block; margin-top: 4px;">
             Rule: A reusable bag cannot have multiple active deposits in progress simultaneously.
@@ -1142,7 +1142,7 @@ const App = {
 
         <div class="form-group">
           <label class="form-label">Collector Notes (Optional)</label>
-          <input type="text" id="pickup-notes" class="form-input" placeholder="e.g. Bag seal intact, verified QR code">
+          <input type="text" id="pickup-notes" class="form-input" placeholder="e.g. Bag seal intact, verified barcode tag">
         </div>
 
         <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
@@ -1195,14 +1195,8 @@ const App = {
         </div>
 
         <div class="form-group">
-          <label class="form-label">Contamination Penalty (%)</label>
-          <input type="number" id="vf-contamination" class="form-input" min="0" max="100" step="1" value="0" oninput="App.calculatePointsPreview()">
-          <small style="color: var(--text-muted); font-size: 0.72rem;">Deducts proportionately from points if foreign non-recyclable materials are present.</small>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Contamination Notes</label>
-          <input type="text" id="vf-contamination-notes" class="form-input" placeholder="e.g. Unwashed food containers, dirt residue">
+          <label class="form-label">Operator Notes (Optional)</label>
+          <input type="text" id="vf-operator-notes" class="form-input" placeholder="e.g. Batch inspected and sorted cleanly">
         </div>
 
         <div class="form-group">
@@ -1235,22 +1229,17 @@ const App = {
   calculatePointsPreview() {
     const weightEl = document.getElementById('vf-weight');
     const catEl = document.getElementById('vf-category-id');
-    const contamEl = document.getElementById('vf-contamination');
     const previewEl = document.getElementById('vf-points-preview');
 
     if (!weightEl || !catEl || !previewEl) return;
 
     const weight = parseFloat(weightEl.value) || 0;
     const catId = parseInt(catEl.value);
-    const contam = parseFloat(contamEl ? contamEl.value : 0) || 0;
 
     const category = this.state.categories.find(c => c.id === catId);
     const rate = category ? category.pointsPerKg : 10;
 
-    const basePoints = Math.round(weight * rate);
-    const deduction = Math.round(basePoints * (contam / 100.0));
-    const finalPoints = Math.max(0, basePoints - deduction);
-
+    const finalPoints = Math.round(weight * rate);
     previewEl.textContent = `+${finalPoints} pts`;
   },
 
@@ -1258,16 +1247,12 @@ const App = {
     e.preventDefault();
     const actualCategoryId = parseInt(document.getElementById('vf-category-id').value);
     const actualWeight = parseFloat(document.getElementById('vf-weight').value);
-    const contaminationRate = parseFloat(document.getElementById('vf-contamination').value) || 0;
-    const contaminationNotes = document.getElementById('vf-contamination-notes').value.trim();
     const processingOutcome = document.getElementById('vf-outcome').value;
 
     try {
       await API.facility.verifyDeposit(depositId, {
         actualCategoryId,
         actualWeight,
-        contaminationRate,
-        contaminationNotes,
         processingOutcome,
         reject: false
       });
@@ -1281,13 +1266,10 @@ const App = {
 
   async handleRejectSubmit(depositId) {
     if (!confirm('Are you sure you want to REJECT this deposit? Zero points will be credited.')) return;
-    const contaminationNotes = document.getElementById('vf-contamination-notes').value.trim() || 'Severe contamination beyond threshold';
     try {
       await API.facility.verifyDeposit(depositId, {
         actualCategoryId: parseInt(document.getElementById('vf-category-id').value),
         actualWeight: parseFloat(document.getElementById('vf-weight').value) || 1.0,
-        contaminationRate: 100,
-        contaminationNotes,
         processingOutcome: 'LANDFILL_REJECTED',
         reject: true
       });

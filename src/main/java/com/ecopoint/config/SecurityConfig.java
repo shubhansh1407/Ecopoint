@@ -34,10 +34,17 @@ public class SecurityConfig {
             .csrf(AbstractHttpConfigurer::disable)
             .securityContext(context -> context.securityContextRepository(securityContextRepository()))
             .authorizeHttpRequests(auth -> auth
-                // Static assets & documentation
+                // Static assets & HTML pages
                 .requestMatchers(
                     "/",
                     "/index.html",
+                    "/login.html",
+                    "/register.html",
+                    "/user-dashboard.html",
+                    "/collector-dashboard.html",
+                    "/facility-dashboard.html",
+                    "/admin-dashboard.html",
+                    "/*.html",
                     "/css/**",
                     "/js/**",
                     "/assets/**",

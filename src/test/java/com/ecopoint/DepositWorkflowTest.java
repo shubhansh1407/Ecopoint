@@ -96,27 +96,24 @@ class DepositWorkflowTest {
         assertEquals(testCollector.getId(), pickedUp.getCollector().getId());
         assertNotNull(pickedUp.getPickedUpAt());
 
-        // 4. Facility operator verifies and grades deposit
-        // Actual weight: 4.0 kg, Contamination: 10% penalty
-        // Rate: 10 pts/kg. Base = 4.0 * 10 = 40 pts. Penalty = 40 * 10% = 4 pts. Final = 36 pts.
+        // 4. Facility operator verifies and weighs deposit
+        // Actual weight: 4.0 kg. Rate: 10 pts/kg. Final = 4.0 * 10 = 40 pts.
         int initialBalance = walletService.getOrCreateWallet(testUser).getBalance();
 
         VerificationRequest vReq = new VerificationRequest();
         vReq.setActualCategoryId(plasticCat.getId());
         vReq.setActualWeight(4.0);
-        vReq.setContaminationRate(10.0);
-        vReq.setContaminationNotes("Small label adhesive contamination");
         vReq.setProcessingOutcome(WasteDeposit.Outcome.RECYCLED);
         vReq.setReject(false);
 
         WasteDeposit verified = depositService.verifyDeposit(deposit.getId(), testOperator, vReq);
         assertEquals(WasteDeposit.Status.VERIFIED, verified.getStatus());
-        assertEquals(36, verified.getPointsAwarded());
+        assertEquals(40, verified.getPointsAwarded());
         assertTrue(verified.getIsPointsCredited());
 
-        // 5. Verify wallet points increased by exactly 36 points
+        // 5. Verify wallet points increased by exactly 40 points
         int newBalance = walletService.getOrCreateWallet(testUser).getBalance();
-        assertEquals(initialBalance + 36, newBalance);
+        assertEquals(initialBalance + 40, newBalance);
 
         // 6. Anti-fraud constraint: Double credit must be prevented
         assertThrows(IllegalStateException.class, () -> {

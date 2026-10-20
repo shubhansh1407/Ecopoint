@@ -78,4 +78,25 @@ public class WalletTransaction {
 
     public Instant getTimestamp() { return timestamp; }
     public void setTimestamp(Instant timestamp) { this.timestamp = timestamp; }
+
+    @Transient
+    public String getUserFullName() {
+        if (wallet != null && wallet.getUser() != null) {
+            return wallet.getUser().getFullName();
+        }
+        return null;
+    }
+
+    @Transient
+    public String getReferenceId() {
+        if (deposit != null && deposit.getDepositCode() != null) {
+            return deposit.getDepositCode();
+        }
+        return null;
+    }
+
+    @Transient
+    public Instant getCreatedAt() {
+        return timestamp;
+    }
 }

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Collector Dashboard — Ecopoint Platform">
+  <meta name="theme-color" content="#66835B">
+  <title>Collector Dashboard — Ecopoint</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/theme.css">
+</head>
+<body>
+
+  <div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="logo-badge">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M5 18H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3.19M15 6h2a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-3.19"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1>Ecopoint</h1>
+          <p>Collector Portal</p>
+        </div>
+      </div>
+
+      <nav class="nav-section">
+        <div class="nav-label">Collector Operations</div>
+        <a href="/collector-dashboard.html" class="nav-item active">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 18H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3.19M15 6h2a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-3.19"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>
+          Pending Pickups
+        </a>
+
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-profile-card">
+          <div class="avatar" id="user-avatar">C</div>
+          <div class="user-info">
+            <div class="user-name" id="user-full-name">Suresh Patil</div>
+            <span class="user-role-badge" id="user-role-label">COLLECTOR</span>
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="Common.logout()" title="Logout" style="padding: 6px 8px;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="main-wrapper">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="menu-toggle-btn" onclick="document.getElementById('sidebar').classList.toggle('open')" aria-label="Toggle navigation">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+          <h2 class="page-title">Collector Route & Custody Queue</h2>
+        </div>
+
+        <div class="topbar-actions">
+          <button class="theme-toggle-btn" onclick="Common.toggleTheme()" aria-label="Toggle theme">
+            <span id="theme-icon"></span>
+          </button>
+        </div>
+      </header>
+
+      <main class="content-area">
+        <div style="margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+          <div>
+            <h3 style="font-size: 1.35rem; font-weight: 800;">Pending Municipal Pickups</h3>
+            <p style="color: var(--text-secondary); font-size: 0.88rem;">Scan reusable bag QR code or verify bag code to confirm custody and transfer to facility.</p>
+          </div>
+          <span class="badge badge-submitted" id="pickup-count-badge" style="font-size: 0.85rem; padding: 6px 14px;">
+            0 pending
+          </span>
+        </div>
+
+        <div class="glass-card">
+          <div id="collector-queue-container">Loading pickups queue...</div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/common.js"></script>
+  <script src="/js/collector-dashboard.js"></script>
+</body>
+</html>

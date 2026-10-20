@@ -13,7 +13,7 @@ public class CsvExportService {
     public byte[] exportDepositsToCsv(List<WasteDeposit> deposits) {
         StringBuilder sb = new StringBuilder();
         // RFC 4180 header
-        sb.append("Deposit Code,User Name,User Email,Bag Code,Category,Estimated Weight (kg),Actual Weight (kg),Status,Points Awarded,Contamination %,Processing Outcome,Created At,Verified At\n");
+        sb.append("Deposit Code,User Name,User Email,Bag Code,Category,Estimated Weight (kg),Actual Weight (kg),Status,Points Awarded,Processing Outcome,Created At,Verified At\n");
 
         for (WasteDeposit d : deposits) {
             sb.append(escapeCsv(d.getDepositCode())).append(",");
@@ -25,7 +25,6 @@ public class CsvExportService {
             sb.append(d.getActualWeight() != null ? d.getActualWeight() : "").append(",");
             sb.append(escapeCsv(d.getStatus().name())).append(",");
             sb.append(d.getPointsAwarded() != null ? d.getPointsAwarded() : 0).append(",");
-            sb.append(d.getContaminationRate() != null ? d.getContaminationRate() : 0.0).append(",");
             sb.append(escapeCsv(d.getProcessingOutcome().name())).append(",");
             sb.append(escapeCsv(d.getCreatedAt().toString())).append(",");
             sb.append(d.getVerifiedAt() != null ? escapeCsv(d.getVerifiedAt().toString()) : "");

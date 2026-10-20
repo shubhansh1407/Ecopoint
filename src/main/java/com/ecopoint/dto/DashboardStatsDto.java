@@ -10,7 +10,6 @@ public class DashboardStatsDto {
     private long verifiedCount;
     private long totalUsersCount;
     private long totalRedemptionsCount;
-
     public DashboardStatsDto() {}
 
     public long getTotalDeposits() { return totalDeposits; }

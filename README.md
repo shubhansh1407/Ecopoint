@@ -15,7 +15,7 @@ Traditional municipal waste collection often fails because citizens lack transpa
 [Collector] Physical Verification & Custody Pickup
    │
    ▼
-[Material Recovery Facility] Weighing, Grading & Contamination Deduction
+[Material Recovery Facility] Weighing & Category Verification
    │
    ▼
 [EcoWallet] Automated EcoPoint Credit & Voucher Redemption
@@ -40,16 +40,15 @@ Traditional municipal waste collection often fails because citizens lack transpa
 1. **Server-Side Role-Based Access Control**:
    - `ROLE_USER`: Deposit registration, personal timeline, EcoWallet, reward redemption.
    - `ROLE_COLLECTOR`: Pickup queue, verification of physical bag code, custody transfer.
-   - `ROLE_OPERATOR`: Facility grading, actual weight measurement, contamination penalty, processing outcome assignment, point authorization.
+   - `ROLE_OPERATOR`: Facility verification, actual scale weight measurement, processing outcome assignment, point authorization.
    - `ROLE_ADMIN`: Municipal analytics, user directory, bag registry, waste category rate management, global ledger, and CSV export.
 
 2. **Anti-Fraud & Integrity Constraints**:
    - **Reusable Bag Uniqueness**: One reusable bag code cannot have multiple unresolved active deposits. If a bag is currently `SUBMITTED`, `PICKED_UP`, or `AT_FACILITY`, creating a new deposit with the same bag code is strictly rejected until facility verification is completed.
    - **Anti-Double-Credit**: EcoPoints are awarded inside an ACID database transaction. Deposits maintain an `isPointsCredited` flag to mathematically prevent double credits.
-   - **Contamination Penalty**:
-     $$\text{Base Points} = \text{round}(\text{Actual Weight (kg)} \times \text{Category Rate})$$
-     $$\text{Deduction} = \text{round}\left(\text{Base Points} \times \frac{\text{Contamination Rate \%}}{100}\right)$$
-     $$\text{Final Awarded Points} = \max(0, \text{Base Points} - \text{Deduction})$$
+   - **Scale-Verified Points Model**:
+     $$\text{Awarded EcoPoints} = \text{round}(\text{Actual Scale Weight (kg)} \times \text{Category Rate})$$
+     Points are calculated directly from verified scale weight and category rates once inspected by facility operators.
    - **Double-Entry Wallet Ledger**: Every EcoPoint awarded or redeemed is permanently logged in `wallet_transactions` with running balances and timestamps.
    - **Stock & Code Integrity**: Reward redemption atomically validates user points and reward stock, generates a unique 16-character alphanumeric voucher code (`ECO-RED-XXXX-XXXX`), and logs a debit ledger transaction.
 

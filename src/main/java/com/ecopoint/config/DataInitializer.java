@@ -80,8 +80,6 @@ public class DataInitializer {
                     historicalDep.setFacilityOperator(operator);
                     historicalDep.setActualCategory(plastic);
                     historicalDep.setActualWeight(4.2);
-                    historicalDep.setContaminationRate(5.0);
-                    historicalDep.setContaminationNotes("Small trace of moisture; accepted");
                     historicalDep.setProcessingOutcome(WasteDeposit.Outcome.RECYCLED);
                     historicalDep.setPickedUpAt(Instant.now().minus(2, ChronoUnit.DAYS));
                     historicalDep.setVerifiedAt(Instant.now().minus(1, ChronoUnit.DAYS));

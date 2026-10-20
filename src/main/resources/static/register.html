@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Create an account on Ecopoint Platform">
+  <meta name="theme-color" content="#66835B">
+  <title>Register — Ecopoint Platform</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/theme.css">
+</head>
+<body style="display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px;">
+
+  <div style="width: 100%; max-width: 500px;">
+    <!-- Logo & Title -->
+    <div style="text-align: center; margin-bottom: 24px;">
+      <a href="/index.html" style="text-decoration: none; display: inline-flex; align-items: center; gap: 12px; color: var(--text-primary);">
+        <div class="logo-badge" style="width: 46px; height: 46px;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/>
+            <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>
+          </svg>
+        </div>
+        <div style="text-align: left;">
+          <h1 style="font-size: 1.35rem; font-weight: 800; letter-spacing: -0.02em;">Ecopoint</h1>
+          <p style="font-size: 0.75rem; color: var(--color-primary); font-weight: 600; text-transform: uppercase;">Citizen Registration</p>
+        </div>
+      </a>
+    </div>
+
+    <!-- Registration Glass Card -->
+    <div class="glass-card" style="padding: 32px;">
+      <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 6px;">Create New Account</h2>
+      <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 20px;">Join the verifiable municipal waste segregation initiative.</p>
+
+      <form id="register-form" onsubmit="handleRegisterSubmit(event)">
+        <div class="form-group">
+          <label class="form-label" for="reg-name">Full Name</label>
+          <input type="text" id="reg-name" class="form-input" placeholder="e.g. Priya Iyer" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="reg-email">Email Address</label>
+          <input type="email" id="reg-email" class="form-input" placeholder="e.g. priya@example.com" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="reg-password">Password (minimum 6 characters)</label>
+          <input type="password" id="reg-password" class="form-input" placeholder="Create a secure password" minlength="6" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="reg-phone">Phone Number</label>
+          <input type="tel" id="reg-phone" class="form-input" placeholder="e.g. 9820012345">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="reg-role">Account Type</label>
+          <select id="reg-role" class="form-select">
+            <option value="ROLE_USER">Citizen User (Segregate waste & earn rewards)</option>
+            <option value="ROLE_COLLECTOR">Waste Collector (Pick up reusable bags)</option>
+            <option value="ROLE_OPERATOR">Facility Operator (Inspect & grade materials)</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">
+          Create Account
+        </button>
+      </form>
+
+      <div style="text-align: center; margin-top: 20px; font-size: 0.85rem; color: var(--text-secondary);">
+        Already registered? <a href="/login.html" style="color: var(--color-primary); font-weight: 600; text-decoration: none;">Sign in here</a>
+      </div>
+    </div>
+
+    <!-- Back to home -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding: 0 10px;">
+      <a href="/index.html" style="font-size: 0.85rem; color: var(--text-secondary); text-decoration: none; font-weight: 500;">← Back to Landing Page</a>
+      <button class="theme-toggle-btn" onclick="Common.toggleTheme()" aria-label="Toggle theme">
+        <span id="theme-icon"></span>
+      </button>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/common.js"></script>
+  <script>
+    async function handleRegisterSubmit(e) {
+      e.preventDefault();
+      const fullName = document.getElementById('reg-name').value.trim();
+      const email = document.getElementById('reg-email').value.trim();
+      const password = document.getElementById('reg-password').value;
+      const phone = document.getElementById('reg-phone').value.trim();
+      const role = document.getElementById('reg-role').value;
+
+      try {
+        const user = await API.auth.register({ fullName, email, password, phone, role });
+        Common.showToast(`Account created! Welcome, ${user.fullName}`, 'success');
+        setTimeout(() => Common.redirectToRoleHome(user.role), 400);
+      } catch (err) {
+        Common.showToast(err.message, 'error');
+      }
+    }
+  </script>
+</body>
+</html>

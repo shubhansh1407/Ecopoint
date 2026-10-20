@@ -150,8 +150,8 @@ public class DepositService {
         deposit.setFacilityOperator(operator);
         deposit.setActualCategory(actualCategory);
         deposit.setActualWeight(req.getActualWeight());
-        deposit.setContaminationRate(req.getContaminationRate() != null ? req.getContaminationRate() : 0.0);
-        deposit.setContaminationNotes(req.getContaminationNotes());
+        deposit.setContaminationRate(0.0);
+        deposit.setContaminationNotes(null);
         deposit.setVerifiedAt(Instant.now());
 
         if (req.isReject()) {
@@ -161,20 +161,15 @@ public class DepositService {
             deposit.setIsPointsCredited(true);
             deposit = depositRepository.save(deposit);
 
-            String note = "Deposit rejected during facility grading. Reason: " +
-                    (req.getContaminationNotes() != null ? req.getContaminationNotes() : "Severe contamination");
+            String note = "Deposit rejected during facility inspection. Reason: " +
+                    (req.getOperatorNotes() != null && !req.getOperatorNotes().isBlank() ? req.getOperatorNotes() : "Material does not meet recycling standards");
             recordEvent(deposit, WasteDeposit.Status.REJECTED, operator.getFullName(), "ROLE_OPERATOR", note);
             return deposit;
         }
 
-        // Calculate EcoPoints
-        // basePoints = actualWeight * categoryRatePerKg
-        // contamination deduction = basePoints * (contaminationRate / 100)
+        // Calculate EcoPoints: basePoints = actualWeight * categoryRatePerKg
         int ratePerKg = actualCategory.getPointsPerKg();
-        int basePoints = (int) Math.round(req.getActualWeight() * ratePerKg);
-        double contam = deposit.getContaminationRate();
-        int deduction = (int) Math.round(basePoints * (contam / 100.0));
-        int finalPoints = Math.max(0, basePoints - deduction);
+        int finalPoints = (int) Math.round(req.getActualWeight() * ratePerKg);
 
         deposit.setStatus(WasteDeposit.Status.VERIFIED);
         deposit.setProcessingOutcome(req.getProcessingOutcome());
@@ -188,8 +183,7 @@ public class DepositService {
             finalPoints,
             deposit,
             "EcoPoints awarded for deposit " + deposit.getDepositCode() +
-            " (" + actualCategory.getName() + ", " + req.getActualWeight() + " kg" +
-            (contam > 0 ? ", " + contam + "% contamination penalty" : "") + ")"
+            " (" + actualCategory.getName() + ", " + req.getActualWeight() + " kg)"
         );
 
         String note = "Verification complete. Accepted weight: " + req.getActualWeight() +
