@@ -32,6 +32,12 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .csrf(AbstractHttpConfigurer::disable)
+            .headers(headers -> headers
+                .frameOptions(frame -> frame.sameOrigin())
+            )
+            .sessionManagement(session -> session
+                .sessionFixation(sf -> sf.changeSessionId())
+            )
             .securityContext(context -> context.securityContextRepository(securityContextRepository()))
             .authorizeHttpRequests(auth -> auth
                 // Static assets & HTML pages

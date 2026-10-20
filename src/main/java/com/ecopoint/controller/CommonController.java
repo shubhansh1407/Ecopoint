@@ -44,8 +44,14 @@ public class CommonController {
                 .collect(Collectors.toList()));
     }
 
+    @org.springframework.beans.factory.annotation.Value("${ecopoint.demo.switch-enabled:false}")
+    private boolean demoSwitchEnabled;
+
     @GetMapping("/demo-users")
     public ResponseEntity<List<Map<String, String>>> getDemoUsers() {
+        if (!demoSwitchEnabled) {
+            return ResponseEntity.ok(java.util.Collections.emptyList());
+        }
         return ResponseEntity.ok(List.of(
             Map.of("role", "Citizen User", "email", "user@ecopoint.com", "badge", "USER"),
             Map.of("role", "Waste Collector", "email", "collector@ecopoint.com", "badge", "COLLECTOR"),

@@ -58,12 +58,14 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label" for="reg-role">Account Type</label>
-          <select id="reg-role" class="form-select">
-            <option value="ROLE_USER">Citizen User (Segregate waste & earn rewards)</option>
-            <option value="ROLE_COLLECTOR">Waste Collector (Pick up reusable bags)</option>
-            <option value="ROLE_OPERATOR">Facility Operator (Inspect & grade materials)</option>
-          </select>
+          <label class="form-label">Account Type</label>
+          <div style="background: rgba(255,255,255,0.05); padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 0.88rem; color: var(--text-primary); display: flex; align-items: center; justify-content: space-between;">
+            <span>🌱 <strong>Citizen Account</strong> (Earn points for segregated waste)</span>
+          </div>
+          <p style="font-size: 0.76rem; color: var(--text-muted); margin-top: 6px;">
+            Waste Collector &amp; Facility Operator staff accounts are provisioned exclusively by Municipal Administrators.
+          </p>
+          <input type="hidden" id="reg-role" value="ROLE_USER">
         </div>
 
         <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">

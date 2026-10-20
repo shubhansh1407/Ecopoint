@@ -34,7 +34,7 @@ public class AuthService {
             req.getEmail().trim().toLowerCase(),
             passwordEncoder.encode(req.getPassword()),
             req.getPhone() != null ? req.getPhone().trim() : "",
-            req.getRole() != null ? req.getRole() : User.Role.ROLE_USER
+            User.Role.ROLE_USER
         );
 
         user = userRepository.save(user);

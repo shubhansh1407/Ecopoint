@@ -40,6 +40,9 @@ public class DepositService {
 
     @Transactional
     public WasteDeposit createDeposit(User user, DepositRequest req) {
+        if (req.getEstimatedWeight() == null || req.getEstimatedWeight() <= 0.0) {
+            throw new IllegalArgumentException("Estimated weight must be greater than 0 kg.");
+        }
         String cleanBagCode = req.getBagCode().trim().toUpperCase();
 
         // 1. Find or auto-register bag
@@ -134,6 +137,11 @@ public class DepositService {
                 .orElseThrow(() -> new IllegalArgumentException("Deposit not found: " + depositId));
 
         // Enforce valid status transition
+        if (deposit.getStatus() == WasteDeposit.Status.VERIFIED || deposit.getStatus() == WasteDeposit.Status.REJECTED) {
+            throw new IllegalStateException("Deposit " + deposit.getDepositCode() +
+                    " has already been finalized (" + deposit.getStatus() + "). Duplicate verification is prohibited.");
+        }
+
         if (deposit.getStatus() != WasteDeposit.Status.PICKED_UP && deposit.getStatus() != WasteDeposit.Status.AT_FACILITY) {
             throw new IllegalStateException("Deposit " + deposit.getDepositCode() +
                     " cannot be verified from status " + deposit.getStatus() + ". It must be picked up first.");
@@ -142,6 +150,15 @@ public class DepositService {
         // Anti-fraud: prevent duplicate credit
         if (Boolean.TRUE.equals(deposit.getIsPointsCredited())) {
             throw new IllegalStateException("Deposit " + deposit.getDepositCode() + " has already been credited.");
+        }
+
+        if (!req.isReject()) {
+            if (req.getActualWeight() == null || req.getActualWeight() <= 0.0) {
+                throw new IllegalArgumentException("Actual measured weight must be greater than 0 kg.");
+            }
+            if (req.getProcessingOutcome() == null || req.getProcessingOutcome() == WasteDeposit.Outcome.PENDING) {
+                throw new IllegalArgumentException("A valid final circular processing outcome must be specified.");
+            }
         }
 
         WasteCategory actualCategory = categoryRepository.findById(req.getActualCategoryId())

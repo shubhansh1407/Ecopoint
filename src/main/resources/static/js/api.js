@@ -89,6 +89,7 @@ const API = {
     getStats: () => API.request('/api/admin/stats'),
     getDeposits: () => API.request('/api/admin/deposits'),
     getUsers: () => API.request('/api/admin/users'),
+    createUser: (userData) => API.request('/api/admin/users', { method: 'POST', body: JSON.stringify(userData) }),
     getBags: () => API.request('/api/admin/bags'),
     registerBag: (bagCode) => API.request('/api/admin/bags', { method: 'POST', body: JSON.stringify({ bagCode }) }),
     getCategories: () => API.request('/api/admin/categories'),

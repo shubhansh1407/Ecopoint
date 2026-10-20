@@ -53,12 +53,16 @@ public class RewardService {
             throw new IllegalStateException("Reward '" + reward.getTitle() + "' is out of stock.");
         }
 
+        // Atomically decrement stock in database to prevent concurrent race conditions
+        int updated = rewardRepository.decrementStockIfAvailable(rewardId);
+        if (updated == 0) {
+            throw new IllegalStateException("Reward '" + reward.getTitle() + "' is out of stock.");
+        }
+
         // Deduct points from wallet and record ledger entry
         walletService.debitPoints(user, reward.getPointsCost(), "Redeemed reward: " + reward.getTitle());
 
-        // Decrement stock
         reward.setStock(reward.getStock() - 1);
-        rewardRepository.save(reward);
 
         // Generate unique 16-character alphanumeric redemption voucher code
         String code = generateRedemptionCode();

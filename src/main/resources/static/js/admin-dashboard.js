@@ -4,6 +4,7 @@
  */
 const AdminDashboard = {
   stats: null,
+  users: [],
   deposits: [],
   bags: [],
   categories: [],
@@ -16,6 +17,7 @@ const AdminDashboard = {
 
     await this.loadAllData();
     this.renderStats();
+    this.renderUsers();
     this.renderDeposits();
     this.renderBags();
     this.renderCategories();
@@ -25,8 +27,9 @@ const AdminDashboard = {
 
   async loadAllData() {
     try {
-      const [stats, deposits, bags, categories, rewards, ledger] = await Promise.all([
+      const [stats, users, deposits, bags, categories, rewards, ledger] = await Promise.all([
         API.admin.getStats(),
+        API.admin.getUsers(),
         API.admin.getDeposits(),
         API.admin.getBags(),
         API.admin.getCategories(),
@@ -34,6 +37,7 @@ const AdminDashboard = {
         API.admin.getLedger()
       ]);
       this.stats = stats;
+      this.users = users;
       this.deposits = deposits;
       this.bags = bags;
       this.categories = categories;
@@ -143,6 +147,117 @@ const AdminDashboard = {
         </div>
       </div>
     `;
+  },
+
+  renderUsers() {
+    const container = document.getElementById('users-table-container');
+    if (!container) return;
+
+    if (!this.users || this.users.length === 0) {
+      container.innerHTML = `<p style="padding: 24px; text-align: center; color: var(--text-muted);">No accounts found.</p>`;
+      return;
+    }
+
+    container.innerHTML = `
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Full Name</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>Role</th>
+              <th>Wallet Balance</th>
+              <th>Created Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${this.users.map(u => `
+              <tr>
+                <td style="font-family: var(--font-mono); font-size: 0.82rem;">#${u.id}</td>
+                <td style="font-weight: 600;">${Common.escapeHtml(u.fullName)}</td>
+                <td style="font-family: var(--font-mono); font-size: 0.85rem;">${Common.escapeHtml(u.email)}</td>
+                <td>${Common.escapeHtml(u.phone || '—')}</td>
+                <td>
+                  <span class="badge ${
+                    u.role === 'ROLE_ADMIN' ? 'badge-verified' :
+                    u.role === 'ROLE_COLLECTOR' ? 'badge-picked' :
+                    u.role === 'ROLE_OPERATOR' ? 'badge-facility' : 'badge-submitted'
+                  }">
+                    ${u.role.replace('ROLE_', '')}
+                  </span>
+                </td>
+                <td style="font-weight: 700; color: var(--color-primary);">${u.walletBalance || 0} pts</td>
+                <td style="font-size: 0.82rem; color: var(--text-muted);">${Common.formatDate(u.createdAt)}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    `;
+  },
+
+  openCreateUserModal() {
+    const html = `
+      <form onsubmit="AdminDashboard.handleCreateUserSubmit(event)">
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 14px;">
+          Provision staff members (Waste Collectors, Facility Operators) or citizen accounts.
+        </p>
+        <div class="form-group">
+          <label class="form-label" for="new-user-name">Full Name</label>
+          <input type="text" id="new-user-name" class="form-input" placeholder="e.g. Ramesh Kumar" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="new-user-email">Email Address</label>
+          <input type="email" id="new-user-email" class="form-input" placeholder="e.g. ramesh.collector@ecopoint.com" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="new-user-password">Temporary Password (min 6 chars)</label>
+          <input type="password" id="new-user-password" class="form-input" placeholder="Temporary password" minlength="6" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="new-user-phone">Phone Number</label>
+          <input type="tel" id="new-user-phone" class="form-input" placeholder="e.g. 9876543210">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="new-user-role">Assigned Role</label>
+          <select id="new-user-role" class="form-select" required>
+            <option value="ROLE_COLLECTOR" selected>🚚 Waste Collector (Pickup &amp; Bag Transfer)</option>
+            <option value="ROLE_OPERATOR">🏭 Facility Operator (Weighing &amp; Quality Grading)</option>
+            <option value="ROLE_USER">🌱 Citizen User (Segregation &amp; Rewards)</option>
+          </select>
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+          <button type="button" class="btn btn-secondary" onclick="Common.closeModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Create Account</button>
+        </div>
+      </form>
+    `;
+    Common.openModal('Provision Staff / User Account', html);
+  },
+
+  async handleCreateUserSubmit(e) {
+    e.preventDefault();
+    const fullName = document.getElementById('new-user-name').value.trim();
+    const email = document.getElementById('new-user-email').value.trim();
+    const password = document.getElementById('new-user-password').value;
+    const phone = document.getElementById('new-user-phone').value.trim();
+    const role = document.getElementById('new-user-role').value;
+
+    try {
+      const created = await API.admin.createUser({ fullName, email, password, phone, role });
+      Common.closeModal();
+      Common.showToast(`Account provisioned successfully for ${created.fullName} (${created.role.replace('ROLE_', '')})!`, 'success');
+      this.users = await API.admin.getUsers();
+      this.renderUsers();
+      if (this.stats) {
+        this.stats.totalUsersCount = this.users.length;
+        this.renderStats();
+      }
+    } catch (err) {
+      Common.showToast(err.message, 'error');
+    }
   },
 
   renderDeposits() {

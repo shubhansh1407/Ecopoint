@@ -2,6 +2,7 @@ package com.ecopoint.controller;
 
 import com.ecopoint.dto.DashboardStatsDto;
 import com.ecopoint.dto.DepositResponse;
+import com.ecopoint.dto.RegisterRequest;
 import com.ecopoint.dto.UserResponse;
 import com.ecopoint.entity.*;
 import com.ecopoint.repository.UserRepository;
@@ -69,6 +70,12 @@ public class AdminController {
                 .map(authService::toUserResponse)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(list);
+    }
+
+    @PostMapping("/users")
+    public ResponseEntity<UserResponse> createUser(@Valid @RequestBody RegisterRequest req) {
+        User created = adminService.createUser(req);
+        return ResponseEntity.ok(authService.toUserResponse(created));
     }
 
     @GetMapping("/bags")
